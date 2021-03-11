@@ -1,11 +1,7 @@
 package com.example.booksearchingapp.books
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.example.booksearchingapp.R
+import androidx.lifecycle.*
 import com.example.booksearchingapp.data.Book
 import com.example.booksearchingapp.data.BookRepository
 import kotlinx.coroutines.launch
@@ -22,6 +18,12 @@ class BooksViewModel @ViewModelInject constructor(
     private val _snackbarMessage = MutableLiveData<Int>()
     val snackbarMessage: LiveData<Int> = _snackbarMessage
 
+    val empty: LiveData<Boolean> = Transformations.map(_books) {
+        it.isEmpty()
+    }
+
+    private var preQuery = ""
+
     fun onTextChanged() {
         searchBooks()
     }
@@ -31,10 +33,13 @@ class BooksViewModel @ViewModelInject constructor(
     }
 
     private fun searchBooks() {
-        if (validateSearchingQuery(searchingQuery.value)) {
-            searchBooks(searchingQuery.value!!)
+        if (validateSearchingQuery(searchingQuery.value).not()) {
+            _books.value = emptyList()
         } else {
-            _snackbarMessage.value = R.string.please_input_text
+            val query = searchingQuery.value!!
+            if (isNewQuery(query)) {
+                searchBooks(query)
+            }
         }
     }
 
@@ -46,6 +51,14 @@ class BooksViewModel @ViewModelInject constructor(
 
     private fun validateSearchingQuery(query: String?): Boolean {
         return query?.isNotEmpty() == true
+    }
+
+    private fun isNewQuery(query: String): Boolean {
+        if (query != preQuery) {
+            preQuery = query
+            return true
+        }
+        return false
     }
 
 }

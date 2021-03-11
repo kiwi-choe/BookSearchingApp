@@ -43,7 +43,8 @@ ext {
     okhttpLoggingVersion = '4.8.0'
     pagingVersion = '3.0.0-alpha02'
     hiltViewModelVersion = '1.0.0-alpha02'
-    
+    materialVersion = '1.3.0'
+
     archTestingVersion = '2.1.0'
     junitVersion = '4.13'
     espressoVersion = '3.3.0'

@@ -1,15 +1,15 @@
 package com.example.booksearchingapp.books
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.booksearchingapp.databinding.FragmentBooksBinding
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,14 +37,30 @@ class BooksFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupEnterSearchingQueryView()
+        setupBooksAdapter()
+        setupSnackbar()
+    }
+
+    private fun setupSnackbar() {
+        viewModel.snackbarMessage.observe(viewLifecycleOwner) { stringRes ->
+            stringRes?.let { showSnackbar(it) }
+        }
+    }
+
+    private fun showSnackbar(@StringRes stringRes: Int) {
+        view?.let { Snackbar.make(it, stringRes, Snackbar.LENGTH_SHORT).show() }
+    }
+
+    private fun setupEnterSearchingQueryView() {
         binding.editBooksSearching.addTextChangedListener {
-            Log.d("##", it?.toString() ?: "")
             viewModel.onTextChanged()
         }
+    }
 
-        viewModel.books.observe(viewLifecycleOwner) {books ->
-            // TODO: 11/03/2021 submitList
-
-        }
+    private fun setupBooksAdapter() {
+        binding.listBooks.adapter = BooksAdapter(viewModel)
     }
 }

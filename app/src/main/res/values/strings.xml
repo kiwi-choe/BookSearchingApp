@@ -2,4 +2,5 @@
     <string name="app_name">Book Searching App</string>
     <string name="please_input_book_title">책 이름을 입력하세요</string>
     <string name="please_input_text">글자를 입력해주세요</string>
+    <string name="no_books">찾으시는 책이 없습니다!</string>
 </resources>
