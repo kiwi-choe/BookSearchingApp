@@ -4,15 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.StringRes
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.booksearchingapp.databinding.FragmentBooksBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.WithFragmentBindings
 
 @AndroidEntryPoint
+@WithFragmentBindings
 class BooksFragment : Fragment() {
 
     companion object {
@@ -45,13 +46,13 @@ class BooksFragment : Fragment() {
     }
 
     private fun setupSnackbar() {
-        viewModel.snackbarMessage.observe(viewLifecycleOwner) { stringRes ->
-            stringRes?.let { showSnackbar(it) }
+        viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
+            message?.let { showSnackbar(it) }
         }
     }
 
-    private fun showSnackbar(@StringRes stringRes: Int) {
-        view?.let { Snackbar.make(it, stringRes, Snackbar.LENGTH_SHORT).show() }
+    private fun showSnackbar(message: String) {
+        view?.let { Snackbar.make(it, message, Snackbar.LENGTH_SHORT).show() }
     }
 
     private fun setupEnterSearchingQueryView() {

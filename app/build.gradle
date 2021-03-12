@@ -57,6 +57,9 @@ dependencies {
     implementation "androidx.hilt:hilt-common:$hiltViewModelVersion"
     implementation "androidx.hilt:hilt-lifecycle-viewmodel:$hiltViewModelVersion"
     kapt "androidx.hilt:hilt-compiler:$hiltViewModelVersion"
+    implementation "com.squareup.picasso:picasso:$picassoVersion"
+    implementation "androidx.paging:paging-runtime:$pagingVersion"
+
 
     // Architecture Components
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$archLifecycleVersion"

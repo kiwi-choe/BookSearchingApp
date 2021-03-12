@@ -1,7 +1,5 @@
 package com.example.booksearchingapp.api
 
-import com.example.booksearchingapp.data.Book
-import com.example.booksearchingapp.data.Result
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -18,7 +16,7 @@ interface BookService {
         @Query("page") page: Int,
         @Query("size") size: Int = 50,
         @Query("query") query: String
-    ): Response<BookResponse>
+    ): BaseResponse<BookResponse>
 
     companion object {
         private const val BASE_URL = "https://dapi.kakao.com"
@@ -30,8 +28,8 @@ interface BookService {
 
             val client = OkHttpClient.Builder()
                 .addInterceptor(logger)
-                .addInterceptor(Interceptor() {chain ->
-                    val newRequest  = chain.request().newBuilder()
+                .addInterceptor(Interceptor() { chain ->
+                    val newRequest = chain.request().newBuilder()
                         .addHeader("Authorization", REST_API_KEY)
                         .build()
                     chain.proceed(newRequest)
@@ -41,6 +39,7 @@ interface BookService {
             return Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(client)
+                .addCallAdapterFactory(BaseResponseAdapterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(BookService::class.java)

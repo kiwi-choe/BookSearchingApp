@@ -5,11 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.booksearchingapp.data.Book
 import com.example.booksearchingapp.databinding.ItemBookBinding
 
 class BooksAdapter(private val viewModel: BooksViewModel) :
-    ListAdapter<Book, BooksAdapter.BookViewHolder>(BooksDiffCallback()) {
+    ListAdapter<BookViewData, BooksAdapter.BookViewHolder>(BooksDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
         return BookViewHolder.from(parent)
@@ -23,7 +22,7 @@ class BooksAdapter(private val viewModel: BooksViewModel) :
     class BookViewHolder private constructor(private val binding: ItemBookBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(viewModel: BooksViewModel, item: Book) {
+        fun bind(viewModel: BooksViewModel, item: BookViewData) {
             binding.run {
                 viewmodel = viewModel
                 book = item
@@ -42,12 +41,12 @@ class BooksAdapter(private val viewModel: BooksViewModel) :
     }
 }
 
-class BooksDiffCallback : DiffUtil.ItemCallback<Book>() {
-    override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean {
+class BooksDiffCallback : DiffUtil.ItemCallback<BookViewData>() {
+    override fun areItemsTheSame(oldItem: BookViewData, newItem: BookViewData): Boolean {
         return oldItem.isbn == newItem.isbn
     }
 
-    override fun areContentsTheSame(oldItem: Book, newItem: Book): Boolean {
+    override fun areContentsTheSame(oldItem: BookViewData, newItem: BookViewData): Boolean {
         return oldItem == newItem
     }
 }

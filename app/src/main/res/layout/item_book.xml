@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -9,19 +11,87 @@
 
         <variable
             name="book"
-            type="com.example.booksearchingapp.data.Book" />
+            type="com.example.booksearchingapp.books.BookViewData" />
     </data>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/lyt_item_book_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <ImageView
+            android:id="@+id/img_item_book_thumbnail"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:imgUrl="@{book.thumbnail}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/txt_item_book_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_launcher_background" />
+
         <TextView
             android:id="@+id/txt_item_book_title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:text="@{book.title}"
+            app:layout_constraintBottom_toTopOf="@id/txt_item_book_desc"
+            app:layout_constraintEnd_toStartOf="@id/txt_item_book_date"
+            app:layout_constraintStart_toEndOf="@id/img_item_book_thumbnail"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="sdfsdfkjsflksjflksfjsdlkfjsdlsdfsdfsdfsdfsdffk.jdskl" />
+
+        <TextView
+            android:id="@+id/txt_item_book_desc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:singleLine="true"
+            android:text="@{book.contents}"
+            app:layout_constraintBottom_toTopOf="@id/txt_item_book_price"
+            app:layout_constraintEnd_toStartOf="@id/lyt_item_book_liked"
+            app:layout_constraintStart_toStartOf="@id/txt_item_book_title"
+            app:layout_constraintTop_toBottomOf="@id/txt_item_book_title"
+            tools:text="titlsdfsfsdfjsdflksdjflkssdfsdfsdfjlkjlkajflksd.jfsldkf.jde" />
+
+        <TextView
+            android:id="@+id/txt_item_book_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{book.price}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/txt_item_book_desc"
+            app:layout_constraintTop_toBottomOf="@id/txt_item_book_desc"
             tools:text="title" />
-    </FrameLayout>
+
+        <TextView
+            android:id="@+id/txt_item_book_date"
+            android:layout_width="0dp"
+            android:singleLine="true"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{book.releaseDate}"
+            app:layout_constraintEnd_toStartOf="@id/lyt_item_book_liked"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/txt_item_book_title"
+            app:layout_constraintTop_toTopOf="@id/txt_item_book_title"
+            tools:text="sdfjklsfjsdlfkjflkjsflkjdflkjsdflksjgfsdfkjsdfkl" />
+
+        <FrameLayout
+            android:id="@+id/lyt_item_book_liked"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/empty_liked"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

@@ -2,6 +2,7 @@ package com.example.booksearchingapp.books
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.example.booksearchingapp.api.BaseResponse
 import com.example.booksearchingapp.data.Book
 import com.example.booksearchingapp.data.BookRepository
 import kotlinx.coroutines.launch
@@ -10,13 +11,13 @@ class BooksViewModel @ViewModelInject constructor(
     private val repository: BookRepository
 ) : ViewModel() {
 
-    private val _books = MutableLiveData<List<Book>>()
-    val books: LiveData<List<Book>> = _books
+    private val _books = MutableLiveData<List<BookViewData>>()
+    val books: LiveData<List<BookViewData>> = _books
 
     val searchingQuery = MutableLiveData<String>()
 
-    private val _snackbarMessage = MutableLiveData<Int>()
-    val snackbarMessage: LiveData<Int> = _snackbarMessage
+    private val _snackbarMessage = MutableLiveData<String>()
+    val snackbarMessage: LiveData<String> = _snackbarMessage
 
     val empty: LiveData<Boolean> = Transformations.map(_books) {
         it.isEmpty()
@@ -45,8 +46,30 @@ class BooksViewModel @ViewModelInject constructor(
 
     private fun searchBooks(searchQuery: String) {
         viewModelScope.launch {
-            _books.value = repository.searchBooks(searchQuery)
+            repository.searchBooks(searchQuery).let { result ->
+                _books.value = when (result) {
+                    is BaseResponse.Success -> {
+                        result.data.map { convertToViewData(it) }
+                    }
+                    else -> {
+                        _snackbarMessage.value = result.toString()
+                        emptyList()
+                    }
+                }
+            }
         }
+    }
+
+    private fun convertToViewData(it: Book): BookViewData {
+        return BookViewData(
+            it.title,
+            it.contents,
+            it.isbn,
+            it.datetime,
+            it.sale_price.toString(),
+            it.publisher,
+            it.thumbnail
+        )
     }
 
     private fun validateSearchingQuery(query: String?): Boolean {
