@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.booksearchingapp.databinding.FragmentBooksBinding
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,6 +45,13 @@ class BooksFragment : Fragment() {
         setupEnterSearchingQueryView()
         setupBooksAdapter()
         setupSnackbar()
+        setupNavigate()
+    }
+
+    private fun setupNavigate() {
+        viewModel.navigateToBookDetail.observe(viewLifecycleOwner) {
+            // TODO: 13/03/2021 navigate to Book detail page
+        }
     }
 
     private fun setupSnackbar() {
@@ -62,6 +71,20 @@ class BooksFragment : Fragment() {
     }
 
     private fun setupBooksAdapter() {
-        binding.listBooks.adapter = BooksAdapter(viewModel)
+        binding.listBooks.run {
+            adapter = BooksAdapter(viewModel)
+            layoutManager?.let { layoutManager ->
+                addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
+                    override fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?) {
+                        viewModel.listScrolled(page + 1)
+                    }
+                })
+            }
+
+            viewModel.books.observe(viewLifecycleOwner) { list ->
+                (adapter as? BooksAdapter)?.addBooks(list)
+            }
+
+        }
     }
 }

@@ -19,6 +19,16 @@ class BooksAdapter(private val viewModel: BooksViewModel) :
         holder.bind(viewModel, item)
     }
 
+    fun addBooks(list: List<BookViewData>?) {
+        if (list.isNullOrEmpty()) {
+            return
+        }
+
+        val index = itemCount
+        submitList(list)
+        notifyItemRangeInserted(index, itemCount)
+    }
+
     class BookViewHolder private constructor(private val binding: ItemBookBinding) :
         RecyclerView.ViewHolder(binding.root) {
 

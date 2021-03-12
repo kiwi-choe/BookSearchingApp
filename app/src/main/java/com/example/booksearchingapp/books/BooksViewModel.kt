@@ -19,6 +19,9 @@ class BooksViewModel @ViewModelInject constructor(
     private val _snackbarMessage = MutableLiveData<String>()
     val snackbarMessage: LiveData<String> = _snackbarMessage
 
+    private val _navigateToBookDetail = MutableLiveData<Unit>()
+    val navigateToBookDetail: LiveData<Unit> = _navigateToBookDetail
+
     val empty: LiveData<Boolean> = Transformations.map(_books) {
         it.isEmpty()
     }
@@ -33,20 +36,28 @@ class BooksViewModel @ViewModelInject constructor(
         searchBooks()
     }
 
+    fun onItemClicked() {
+        _navigateToBookDetail.value = Unit
+    }
+
+    companion object {
+        private const val FIRST_PAGE = 1
+    }
+
     private fun searchBooks() {
         if (validateSearchingQuery(searchingQuery.value).not()) {
             _books.value = emptyList()
         } else {
             val query = searchingQuery.value!!
             if (isNewQuery(query)) {
-                searchBooks(query)
+                searchBooks(query, FIRST_PAGE)
             }
         }
     }
 
-    private fun searchBooks(searchQuery: String) {
+    private fun searchBooks(searchQuery: String, page: Int) {
         viewModelScope.launch {
-            repository.searchBooks(searchQuery).let { result ->
+            repository.searchBooks(searchQuery, page).let { result ->
                 _books.value = when (result) {
                     is BaseResponse.Success -> {
                         result.data.map { convertToViewData(it) }
@@ -84,4 +95,10 @@ class BooksViewModel @ViewModelInject constructor(
         return false
     }
 
+    fun listScrolled(page: Int) {
+        val immutableQuery = searchingQuery.value
+        if (immutableQuery != null) {
+            searchBooks(immutableQuery, page)
+        }
+    }
 }

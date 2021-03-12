@@ -17,6 +17,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/lyt_item_book_root"
         android:layout_width="match_parent"
+        android:onClick="@{() -> viewmodel.onItemClicked()}"
         android:layout_height="wrap_content">
 
         <ImageView
