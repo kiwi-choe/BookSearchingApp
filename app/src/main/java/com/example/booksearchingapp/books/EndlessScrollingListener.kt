@@ -3,7 +3,8 @@ package com.example.booksearchingapp.books
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-abstract class EndlessRecyclerViewScrollListener(private val layoutManager: RecyclerView.LayoutManager) : RecyclerView.OnScrollListener() {
+abstract class EndlessRecyclerViewScrollListener(private val layoutManager: RecyclerView.LayoutManager) :
+    RecyclerView.OnScrollListener() {
 
     // The minimum amount of items to have below your current scroll position
     // before loading more.
@@ -25,30 +26,20 @@ abstract class EndlessRecyclerViewScrollListener(private val layoutManager: Recy
     // We are given a few useful parameters to help us work out if we need to load some more data,
     // but first we check if we are waiting for the previous load to finish.
     override fun onScrolled(view: RecyclerView, dx: Int, dy: Int) {
-        val visibleItemCount = layoutManager.childCount
         val totalItemCount = layoutManager.itemCount
-        val lastVisibleItemPosition = (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+        val lastVisibleItemPosition =
+            (layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
 
-        // If it’s still loading, we check to see if the dataset count has
-        // changed, if so we conclude it has finished loading and update the current page
-        // number and total item count.
-        if (loading && totalItemCount > previousTotalItemCount) {
-            loading = false
-            previousTotalItemCount = totalItemCount
-        }
-
-        // If it isn’t currently loading, we check to see if we have breached
-        // the visibleThreshold and need to reload more data.
-        // If we do need to reload some more data, we execute onLoadMore to fetch the data.
-        // threshold should reflect how many total columns there are too
-        if (!loading && (totalItemCount - visibleItemCount
-                    <= lastVisibleItemPosition + visibleThreshold)) {
-            currentPage++
-            onLoadMore(currentPage, totalItemCount, view)
-            loading = true
+        val visibleItemCount = layoutManager.childCount
+        if (visibleItemCount + lastVisibleItemPosition + visibleThreshold >= totalItemCount) {
+            onLoadMore()
         }
     }
 
+    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+        super.onScrollStateChanged(recyclerView, newState)
+    }
+
     // Defines the process for actually loading more data based on page
-    abstract fun onLoadMore(page: Int, totalItemsCount: Int, view: RecyclerView?)
+    abstract fun onLoadMore()
 }

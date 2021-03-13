@@ -1,18 +1,17 @@
 package com.example.booksearchingapp.books
 
+import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.booksearchingapp.api.BaseResponse
 import com.example.booksearchingapp.data.Book
 import com.example.booksearchingapp.data.BookRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class BooksViewModel @ViewModelInject constructor(
     private val repository: BookRepository
 ) : ViewModel() {
-
-    private val _books = MutableLiveData<List<BookViewData>>()
-    val books: LiveData<List<BookViewData>> = _books
 
     val searchingQuery = MutableLiveData<String>()
 
@@ -22,53 +21,56 @@ class BooksViewModel @ViewModelInject constructor(
     private val _navigateToBookDetail = MutableLiveData<Unit>()
     val navigateToBookDetail: LiveData<Unit> = _navigateToBookDetail
 
-    val empty: LiveData<Boolean> = Transformations.map(_books) {
+    private val searchingQueryEvent = MutableLiveData<String>()
+    private val test: LiveData<BaseResponse<List<Book>>> = searchingQueryEvent.switchMap { query ->
+        liveData {
+            if (validateSearchingQuery(query).not()) {
+                _emptySearchingQueryState.value = true
+                return@liveData
+            } else {
+                _emptySearchingQueryState.value = false
+            }
+            if (isNewQuery(query)) {
+                val res =
+                    repository.getSearchedBookResultsLiveData(query).asLiveData(Dispatchers.Main)
+                emitSource(res)
+            }
+        }
+    }
+
+    val bookResults: LiveData<List<BookViewData>> = Transformations.map(test) { result ->
+        when (result) {
+            is BaseResponse.Success -> {
+                Log.d("BooksViewModel", "result ${result.toString()}")
+                result.data.map { convertToViewData(it) }
+            }
+            else -> {
+                _snackbarMessage.value = result.toString()
+                emptyList()
+            }
+        }
+    }
+
+
+    private val _emptySearchingQueryState = MutableLiveData(false)
+    val emptySearchingQueryState: LiveData<Boolean> = _emptySearchingQueryState
+
+    val empty: LiveData<Boolean> = Transformations.map(bookResults) {
         it.isEmpty()
     }
 
     private var preQuery = ""
 
     fun onTextChanged() {
-        searchBooks()
+        searchingQueryEvent.value = searchingQuery.value
     }
 
     fun onSearchButtonClicked() {
-        searchBooks()
+        searchingQueryEvent.value = searchingQuery.value
     }
 
     fun onItemClicked() {
         _navigateToBookDetail.value = Unit
-    }
-
-    companion object {
-        private const val FIRST_PAGE = 1
-    }
-
-    private fun searchBooks() {
-        if (validateSearchingQuery(searchingQuery.value).not()) {
-            _books.value = emptyList()
-        } else {
-            val query = searchingQuery.value!!
-            if (isNewQuery(query)) {
-                searchBooks(query, FIRST_PAGE)
-            }
-        }
-    }
-
-    private fun searchBooks(searchQuery: String, page: Int) {
-        viewModelScope.launch {
-            repository.searchBooks(searchQuery, page).let { result ->
-                _books.value = when (result) {
-                    is BaseResponse.Success -> {
-                        result.data.map { convertToViewData(it) }
-                    }
-                    else -> {
-                        _snackbarMessage.value = result.toString()
-                        emptyList()
-                    }
-                }
-            }
-        }
     }
 
     private fun convertToViewData(it: Book): BookViewData {
@@ -95,10 +97,12 @@ class BooksViewModel @ViewModelInject constructor(
         return false
     }
 
-    fun listScrolled(page: Int) {
+    fun listScrolled() {
         val immutableQuery = searchingQuery.value
         if (immutableQuery != null) {
-            searchBooks(immutableQuery, page)
+            viewModelScope.launch {
+                repository.loadBooksMore(immutableQuery)
+            }
         }
     }
 }
