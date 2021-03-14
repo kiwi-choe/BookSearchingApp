@@ -7,24 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
+import com.example.booksearchingapp.EventObserver
+import com.example.booksearchingapp.R
+import com.example.booksearchingapp.bookdetail.BookDetailFragment
 import com.example.booksearchingapp.databinding.FragmentBooksBinding
 import com.google.android.material.snackbar.Snackbar
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.WithFragmentBindings
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 
-@AndroidEntryPoint
-@WithFragmentBindings
 class BooksFragment : Fragment() {
 
-    companion object {
-        fun newInstance(): BooksFragment = BooksFragment()
-    }
-
-    private val viewModel by viewModels<BooksViewModel>()
+    private val viewModel: BooksViewModel by sharedViewModel()
 
     private lateinit var binding: FragmentBooksBinding
+
+    companion object {
+        fun newInstance(): BooksFragment {
+            Log.d("BooksFragment", "is created")
+            return BooksFragment()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,9 +50,17 @@ class BooksFragment : Fragment() {
     }
 
     private fun setupNavigate() {
-        viewModel.navigateToBookDetail.observe(viewLifecycleOwner) {
-            // TODO: 13/03/2021 navigate to Book detail page
-        }
+        viewModel.navigateToBookDetail.observe(viewLifecycleOwner, EventObserver { bookId ->
+            Log.d("BooksFragment", "navigateToBookDetail livedata is invoked")
+            openBookDetail(bookId)
+        })
+    }
+
+    private fun openBookDetail(bookId: String) {
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, BookDetailFragment.newInstance(bookId))
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun setupSnackbar() {
@@ -73,6 +82,7 @@ class BooksFragment : Fragment() {
     private fun setupBooksAdapter() {
         binding.listBooks.run {
             adapter = BooksAdapter(viewModel)
+
             layoutManager?.let { layoutManager ->
                 addOnScrollListener(object : EndlessRecyclerViewScrollListener(layoutManager) {
                     override fun onLoadMore() {
@@ -81,10 +91,14 @@ class BooksFragment : Fragment() {
                 })
             }
 
-            viewModel.bookResults.observe(viewLifecycleOwner) { list ->
-                Log.d("BooksFragment", "list $list")
+            viewModel.bookPreviewResults.observe(viewLifecycleOwner) { list ->
                 (adapter as? BooksAdapter)?.submitList(list)
             }
+
+            viewModel.updateLikedBook.observe(viewLifecycleOwner, EventObserver { updatedPosition ->
+                Log.d("BooksFragment", "updatedPosition $updatedPosition")
+                (adapter as? BooksAdapter)?.updateLiked(updatedPosition)
+            })
         }
     }
 }

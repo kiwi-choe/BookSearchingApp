@@ -1,0 +1,77 @@
+package com.example.booksearchingapp.bookdetail
+
+import android.os.Bundle
+import android.util.Log
+import android.view.*
+import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.navArgs
+import com.example.booksearchingapp.R
+import com.example.booksearchingapp.books.BooksViewModel
+import com.example.booksearchingapp.databinding.FragmentBookDetailBinding
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+
+class BookDetailFragment : Fragment() {
+
+    companion object {
+        private const val PARAM_KEY_ISBN = "param_key_isbn"
+        fun newInstance(bookId: String) = BookDetailFragment().apply {
+            Log.d("BookDetailFragment", "is created")
+            arguments = bundleOf(PARAM_KEY_ISBN to bookId)
+        }
+    }
+
+    private val viewModel: BooksViewModel by sharedViewModel()
+
+    private lateinit var binding: FragmentBookDetailBinding
+
+//    private val args: BookDetailFragmentArgs by navArgs()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentBookDetailBinding.inflate(inflater, container, false).apply {
+            viewmodel = viewModel
+            lifecycleOwner = viewLifecycleOwner
+        }
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        getArgsBookId()?.let { bookId ->
+            viewModel.getBookDetail(bookId)
+        } ?: return
+
+
+        binding.toolbar.setNavigationOnClickListener {
+            parentFragmentManager.popBackStackImmediate()
+        }
+
+        setHasOptionsMenu(true)
+    }
+
+    private fun getArgsBookId() = arguments?.getString(PARAM_KEY_ISBN)
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.book_detail_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_like -> {
+                getArgsBookId()?.let {
+                    viewModel.likeBook(it)
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+}

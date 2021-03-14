@@ -11,7 +11,7 @@
 
         <variable
             name="book"
-            type="com.example.booksearchingapp.books.BookViewData" />
+            type="com.example.booksearchingapp.books.BookPreviewData" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:onClick="@{() -> viewmodel.onItemClicked()}">
+        android:onClick="@{() -> viewmodel.onItemClicked(book.isbn)}">
 
         <ImageView
             android:id="@+id/img_item_book_thumbnail"
@@ -90,7 +90,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginEnd="16dp"
-            android:background="@color/empty_liked"
+            android:background="@{book.liked ? @color/color_liked: @color/empty_liked}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

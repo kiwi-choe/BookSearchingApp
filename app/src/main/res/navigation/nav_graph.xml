@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/books_dest">
+    <fragment
+        android:id="@+id/books_dest"
+        android:name="com.example.booksearchingapp.books.BooksFragment">
+        <action
+            android:id="@+id/action_books_to_bookDetail"
+            app:destination="@id/book_detail_dest" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/book_detail_dest"
+        android:name="com.example.booksearchingapp.bookdetail.BookDetailFragment"
+        android:label="Book Detail">
+        <action
+            android:id="@+id/action_bookDetail_to_books"
+            app:destination="@+id/books_dest" />
+        <argument
+            android:name="bookId"
+            app:argType="string"
+            app:nullable="false" />
+    </fragment>
+</navigation>

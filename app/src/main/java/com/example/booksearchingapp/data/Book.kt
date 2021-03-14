@@ -10,5 +10,6 @@ data class Book(
     @field:SerializedName("sale_price") val sale_price: Int,
     @field:SerializedName("publisher") val publisher: String,
     @field:SerializedName("thumbnail") val thumbnail: String,
-    @field:SerializedName("status") val status: String
+    @field:SerializedName("status") val status: String,
+    var liked: Boolean = false
 )

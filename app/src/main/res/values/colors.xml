@@ -5,5 +5,6 @@
     <color name="colorAccent">#03DAC5</color>
 
     <color name="empty_liked">#a6a6a6</color>
+    <color name="color_liked">#6200EE</color>
 
 </resources>
