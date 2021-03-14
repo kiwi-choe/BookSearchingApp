@@ -93,6 +93,7 @@ class BooksFragment : Fragment() {
 
             viewModel.bookPreviewResults.observe(viewLifecycleOwner) { list ->
                 (adapter as? BooksAdapter)?.submitList(list)
+                Log.d("BooksFragment", "itemCount ${(adapter as? BooksAdapter)?.itemCount}")
             }
 
             viewModel.updateLikedBook.observe(viewLifecycleOwner, EventObserver { updatedPosition ->

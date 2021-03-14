@@ -3,6 +3,7 @@ package com.example.booksearchingapp.books
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
 class BooksAdapter(private val viewModel: BooksViewModel) :
     ListAdapter<BookPreviewData, BookViewHolder>(BooksDiffCallback()) {
@@ -17,9 +18,12 @@ class BooksAdapter(private val viewModel: BooksViewModel) :
     }
 
     fun updateLiked(updatedPosition: Int) {
+        if(updatedPosition > itemCount || updatedPosition == NO_POSITION) {
+            return
+        }
         val updatingItem = getItem(updatedPosition)
         if (updatingItem != null) {
-            updatingItem.liked = true
+            updatingItem.liked = !updatingItem.liked
             notifyItemChanged(updatedPosition)
         }
     }

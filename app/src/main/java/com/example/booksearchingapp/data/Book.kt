@@ -1,6 +1,7 @@
 package com.example.booksearchingapp.data
 
 import com.google.gson.annotations.SerializedName
+import java.util.concurrent.atomic.AtomicBoolean
 
 data class Book(
     @field:SerializedName("title") val title: String,

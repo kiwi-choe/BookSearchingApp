@@ -9,7 +9,7 @@ class BookRepository(private val service: BookService) {
 
     companion object {
         private const val FIRST_PAGE_INDEX = 1
-        private const val SIZE_PER_PAGE = 50
+        private const val SIZE_PER_PAGE = 40
         private const val SEARCH_BY_TARGET = "title"
     }
 
@@ -43,7 +43,7 @@ class BookRepository(private val service: BookService) {
                 val books = result.data.list ?: emptyList()
                 inMemoryCache.addAll(books)
                 // search something from in cache
-                bookResults.emit(BaseResponse.Success(books))
+                bookResults.emit(BaseResponse.Success(inMemoryCache))
                 success = true
             }
             is BaseResponse.ApiError -> {
@@ -100,7 +100,7 @@ class BookRepository(private val service: BookService) {
     private fun updateBookLikedInMemory(isbn: String): Int {
         var updatedBookPosition = 0
         inMemoryCache.find { it.isbn == isbn }?.also { book ->
-            book.liked = true
+            book.liked = !book.liked
             updatedBookPosition = inMemoryCache.indexOf(book)
         }
         return updatedBookPosition

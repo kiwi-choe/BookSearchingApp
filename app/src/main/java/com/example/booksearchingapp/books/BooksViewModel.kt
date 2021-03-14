@@ -45,7 +45,7 @@ class BooksViewModel(
         Transformations.map(validateAndSearchQuery) { result ->
             when (result) {
                 is BaseResponse.Success -> {
-                    Log.d("BooksViewModel", "result ${result.toString()}")
+                    Log.d("BooksViewModel", "bookPreviewResults ${result.data.size}")
                     result.data.map { convertToViewData(it) }
                 }
                 else -> {
