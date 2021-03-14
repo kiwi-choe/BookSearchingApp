@@ -32,9 +32,3 @@ sealed class BaseResponse<out T : Any> {
         }
     }
 }
-
-///**
-// * `true` if [BaseResponse] is of type [Success] & holds non-null [Success.data].
-// */
-//val BaseResponse<*>.succeeded
-//    get() = this is Success && data != null

@@ -18,5 +18,4 @@ data class Book(
             return date.split("T").firstOrNull() ?: ""
         }
     }
-
 }
