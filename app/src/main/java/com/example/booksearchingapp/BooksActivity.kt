@@ -10,6 +10,12 @@ class BooksActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_books)
 
+        if (savedInstanceState == null) {
+            setupBooksFragment()
+        }
+    }
+
+    private fun setupBooksFragment() {
         supportFragmentManager.beginTransaction()
             .add(
                 R.id.fragment_container,
@@ -17,6 +23,5 @@ class BooksActivity : AppCompatActivity() {
                 BooksFragment::class.java.simpleName
             )
             .commit()
-
     }
 }

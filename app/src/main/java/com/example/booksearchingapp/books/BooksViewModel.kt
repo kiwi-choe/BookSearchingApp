@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.example.booksearchingapp.Event
 import com.example.booksearchingapp.api.BaseResponse
 import com.example.booksearchingapp.data.Book
+import com.example.booksearchingapp.data.Book.Companion.splitDateTime
 import com.example.booksearchingapp.data.BookRepository
 import com.example.booksearchingapp.data.ResultData
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ class BooksViewModel(
         searchingQueryEvent.switchMap { query ->
             liveData {
                 if (validateSearchingQuery(query).not()) {
+                    clearPreQuery()
                     _emptySearchingQueryState.value = true
                     return@liveData
                 } else {
@@ -41,11 +43,11 @@ class BooksViewModel(
             }
         }
 
+
     val bookPreviewResults: LiveData<List<BookPreviewData>> =
         Transformations.map(validateAndSearchQuery) { result ->
             when (result) {
                 is BaseResponse.Success -> {
-                    Log.d("BooksViewModel", "bookPreviewResults ${result.data.size}")
                     result.data.map { convertToViewData(it) }
                 }
                 else -> {
@@ -63,6 +65,10 @@ class BooksViewModel(
     }
 
     private var preQuery = ""
+
+    private fun clearPreQuery() {
+        preQuery = ""
+    }
 
     private val loadBookDetailEvent = MutableLiveData<String>()
     val bookDetail: LiveData<Book> = loadBookDetailEvent.switchMap { bookId ->
@@ -102,7 +108,7 @@ class BooksViewModel(
             it.title,
             it.contents,
             it.isbn,
-            it.datetime,
+            splitDateTime(it.datetime),
             it.sale_price.toString(),
             it.publisher,
             it.thumbnail

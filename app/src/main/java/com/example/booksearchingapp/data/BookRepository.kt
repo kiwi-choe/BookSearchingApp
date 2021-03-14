@@ -9,7 +9,7 @@ class BookRepository(private val service: BookService) {
 
     companion object {
         private const val FIRST_PAGE_INDEX = 1
-        private const val SIZE_PER_PAGE = 40
+        private const val SIZE_PER_PAGE = 50
         private const val SEARCH_BY_TARGET = "title"
     }
 
@@ -62,14 +62,6 @@ class BookRepository(private val service: BookService) {
         isRequestInProgress = false
         return success
     }
-
-//    private fun booksByStringFromInMemory(): List<Book> {
-//        // from the in memory cache select only the repos whose name or description matches
-//        // the query. Then order the results.
-//        return inMemoryCache.filter {
-//            Log.d("Repo", it.toString())
-//            it.toString().contains(query, true)}
-//    }
 
     suspend fun loadBooksMore(searchQuery: String) {
         if (isRequestInProgress) {

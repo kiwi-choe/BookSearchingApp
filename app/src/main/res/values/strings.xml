@@ -5,4 +5,8 @@
     <string name="no_books">찾으시는 책이 없습니다!</string>
     <string name="like">LIKE</string>
     <string name="menu_like">LIKE</string>
+
+    <string name="price_format">가격: %d원</string>
+    <string name="release_date_format">출시일: %s</string>
+    <string name="publisher_format">출판사: %s</string>
 </resources>

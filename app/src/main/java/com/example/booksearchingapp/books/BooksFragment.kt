@@ -1,7 +1,6 @@
 package com.example.booksearchingapp.books
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ class BooksFragment : Fragment() {
 
     companion object {
         fun newInstance(): BooksFragment {
-            Log.d("BooksFragment", "is created")
             return BooksFragment()
         }
     }
@@ -51,7 +49,6 @@ class BooksFragment : Fragment() {
 
     private fun setupNavigate() {
         viewModel.navigateToBookDetail.observe(viewLifecycleOwner, EventObserver { bookId ->
-            Log.d("BooksFragment", "navigateToBookDetail livedata is invoked")
             openBookDetail(bookId)
         })
     }
@@ -93,11 +90,9 @@ class BooksFragment : Fragment() {
 
             viewModel.bookPreviewResults.observe(viewLifecycleOwner) { list ->
                 (adapter as? BooksAdapter)?.submitList(list)
-                Log.d("BooksFragment", "itemCount ${(adapter as? BooksAdapter)?.itemCount}")
             }
 
             viewModel.updateLikedBook.observe(viewLifecycleOwner, EventObserver { updatedPosition ->
-                Log.d("BooksFragment", "updatedPosition $updatedPosition")
                 (adapter as? BooksAdapter)?.updateLiked(updatedPosition)
             })
         }

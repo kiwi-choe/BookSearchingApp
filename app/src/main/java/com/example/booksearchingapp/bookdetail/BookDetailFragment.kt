@@ -16,7 +16,6 @@ class BookDetailFragment : Fragment() {
     companion object {
         private const val PARAM_KEY_ISBN = "param_key_isbn"
         fun newInstance(bookId: String) = BookDetailFragment().apply {
-            Log.d("BookDetailFragment", "is created")
             arguments = bundleOf(PARAM_KEY_ISBN to bookId)
         }
     }

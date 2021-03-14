@@ -35,6 +35,6 @@ class BooksDiffCallback : DiffUtil.ItemCallback<BookPreviewData>() {
     }
 
     override fun areContentsTheSame(oldItem: BookPreviewData, newItem: BookPreviewData): Boolean {
-        return oldItem.isbn == newItem.isbn && oldItem.liked == newItem.liked
+        return oldItem.liked == newItem.liked
     }
 }
