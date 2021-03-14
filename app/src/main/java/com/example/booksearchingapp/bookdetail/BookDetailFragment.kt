@@ -3,10 +3,9 @@ package com.example.booksearchingapp.bookdetail
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.navArgs
 import com.example.booksearchingapp.R
 import com.example.booksearchingapp.books.BooksViewModel
 import com.example.booksearchingapp.databinding.FragmentBookDetailBinding
@@ -26,8 +25,6 @@ class BookDetailFragment : Fragment() {
 
     private lateinit var binding: FragmentBookDetailBinding
 
-//    private val args: BookDetailFragmentArgs by navArgs()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,29 +34,31 @@ class BookDetailFragment : Fragment() {
             viewmodel = viewModel
             lifecycleOwner = viewLifecycleOwner
         }
-
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as? AppCompatActivity)?.setSupportActionBar(binding.toolbar)
+
+        setHasOptionsMenu(true)
+
+
         getArgsBookId()?.let { bookId ->
             viewModel.getBookDetail(bookId)
         } ?: return
 
-
         binding.toolbar.setNavigationOnClickListener {
             parentFragmentManager.popBackStackImmediate()
         }
-
-        setHasOptionsMenu(true)
     }
 
     private fun getArgsBookId() = arguments?.getString(PARAM_KEY_ISBN)
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.book_detail_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
