@@ -1,15 +1,13 @@
 package com.example.booksearchingapp.bookdetail
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.example.booksearchingapp.R
-import com.example.booksearchingapp.books.BooksViewModel
 import com.example.booksearchingapp.databinding.FragmentBookDetailBinding
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class BookDetailFragment : Fragment() {
 
@@ -20,7 +18,7 @@ class BookDetailFragment : Fragment() {
         }
     }
 
-    private val viewModel: BooksViewModel by sharedViewModel()
+    private val viewModel: BookDetailViewModel by viewModel()
 
     private lateinit var binding: FragmentBookDetailBinding
 

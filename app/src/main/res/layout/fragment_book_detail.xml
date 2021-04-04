@@ -7,7 +7,7 @@
 
         <variable
             name="viewmodel"
-            type="com.example.booksearchingapp.books.BooksViewModel" />
+            type="com.example.booksearchingapp.bookdetail.BookDetailViewModel" />
     </data>
 
     <LinearLayout

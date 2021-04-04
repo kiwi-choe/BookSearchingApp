@@ -2,6 +2,7 @@ package com.example.booksearchingapp.di
 
 import com.example.booksearchingapp.api.BaseResponseAdapterFactory
 import com.example.booksearchingapp.api.BookService
+import com.example.booksearchingapp.bookdetail.BookDetailViewModel
 import com.example.booksearchingapp.books.BooksViewModel
 import com.example.booksearchingapp.data.BookRepository
 import okhttp3.Interceptor
@@ -15,6 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 val koinModuleApp = module {
     single { BookRepository(get()) }
     viewModel { BooksViewModel(get()) }
+    viewModel { BookDetailViewModel(get()) }
 }
 
 private const val BASE_URL = "https://dapi.kakao.com"

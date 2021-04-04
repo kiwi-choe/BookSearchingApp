@@ -6,8 +6,8 @@ import com.example.booksearchingapp.api.BaseResponse
 import com.example.booksearchingapp.data.Book
 import com.example.booksearchingapp.data.Book.Companion.splitDateTime
 import com.example.booksearchingapp.data.BookRepository
-import com.example.booksearchingapp.data.ResultData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class BooksViewModel(
@@ -23,32 +23,29 @@ class BooksViewModel(
     val navigateToBookDetail: LiveData<Event<String>> = _navigateToBookDetail
 
     private val searchingQueryEvent = MutableLiveData<String>()
-    private val validateAndSearchQuery: LiveData<BaseResponse<List<Book>>> =
+    val bookPreviewResults: LiveData<List<BookPreviewData>> =
         searchingQueryEvent.switchMap { query ->
             liveData {
                 _emptySearchingQueryState.value = validateSearchingQuery(query).not()
 
-                if (validateSearchingQuery(query)) {
-                    if (isNewQuery(query)) {
-                        val res = repository.getSearchedBookResultsLiveData(query)
-                            .asLiveData(Dispatchers.Main)
-                        emitSource(res)
-                    }
+                if (validateSearchingQuery(query).and(isNewQuery(query))) {
+                    val res = repository.getSearchedBookResultsLiveData(query)
+                        .map { result ->
+                            when (result) {
+                                is BaseResponse.Success -> {
+                                    result.data.map { convertToViewData(it) }
+                                }
+                                else -> {
+                                    _snackbarMessage.value = result.toString()
+                                    emptyList()
+                                }
+                            }
+                        }
+                        .asLiveData(Dispatchers.Main)
+                    emitSource(res)
                 }
-                initPreQuery(query)
-            }
-        }
 
-    val bookPreviewResults: LiveData<List<BookPreviewData>> =
-        Transformations.map(validateAndSearchQuery) { result ->
-            when (result) {
-                is BaseResponse.Success -> {
-                    result.data.map { convertToViewData(it) }
-                }
-                else -> {
-                    _snackbarMessage.value = result.toString()
-                    emptyList()
-                }
+                initPreQuery(query)
             }
         }
 
@@ -64,26 +61,8 @@ class BooksViewModel(
         preQuery = query ?: ""
     }
 
-    private val loadBookDetailEvent = MutableLiveData<String>()
-    val bookDetail: LiveData<Book> = loadBookDetailEvent.switchMap { bookId ->
-        liveData {
-            val res = repository.getBookDetail(bookId)
-            when (res) {
-                is ResultData.Success -> {
-                    emit(res.data)
-                }
-                is ResultData.Error -> {
-                    _snackbarMessage.value = res.errorMessage
-                }
-            }
-        }
-    }
-
-    private val _updateLikedBook = MutableLiveData<Event<Int>>()
-    val updateLikedBook: LiveData<Event<Int>> = _updateLikedBook
-    fun likeBook(bookId: String) {
-        _updateLikedBook.value = Event(repository.updateBookLiked(bookId))
-    }
+    val updatedPositionOfBookLiked: LiveData<Int> =
+        repository.bookLikedPosition.asLiveData(Dispatchers.Main)
 
     fun onTextChanged() {
         searchingQueryEvent.value = searchingQuery.value
@@ -93,24 +72,8 @@ class BooksViewModel(
         searchingQueryEvent.value = searchingQuery.value
     }
 
-    fun onItemClicked(bookId: String) {
-        _navigateToBookDetail.value = Event(bookId)
-    }
-
-    private fun convertToViewData(it: Book): BookPreviewData {
-        return BookPreviewData(
-            it.title,
-            it.contents,
-            it.isbn,
-            splitDateTime(it.datetime),
-            it.sale_price.toString(),
-            it.publisher,
-            it.thumbnail
-        )
-    }
-
     private fun validateSearchingQuery(query: String?): Boolean {
-        return query?.isNotEmpty() == true
+        return query?.isNotBlank() == true
     }
 
     private fun isNewQuery(query: String): Boolean {
@@ -126,7 +89,20 @@ class BooksViewModel(
         }
     }
 
-    fun getBookDetail(bookId: String) {
-        loadBookDetailEvent.value = bookId
+    private fun convertToViewData(it: Book): BookPreviewData {
+        return BookPreviewData(
+            it.title,
+            it.contents,
+            it.isbn,
+            splitDateTime(it.datetime),
+            it.sale_price.toString(),
+            it.publisher,
+            it.thumbnail
+        )
     }
+
+    fun onItemClicked(bookId: String) {
+        _navigateToBookDetail.value = Event(bookId)
+    }
+
 }

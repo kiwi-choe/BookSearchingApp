@@ -2,8 +2,7 @@ package com.example.booksearchingapp.data
 
 import com.example.booksearchingapp.api.BaseResponse
 import com.example.booksearchingapp.api.BookService
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.*
 
 class BookRepository(private val service: BookService) {
 
@@ -30,6 +29,21 @@ class BookRepository(private val service: BookService) {
         inMemoryCache.clear()
         requestSearchBooks(searchQuery)
         return bookResults
+    }
+
+    suspend fun loadBooksMore(searchQuery: String) {
+        if (isRequestInProgress) {
+            return
+        }
+
+        if (isEndPage) {
+            return
+        }
+
+        val success = requestSearchBooks(searchQuery)
+        if (success) {
+            lastPage++
+        }
     }
 
     private suspend fun requestSearchBooks(searchQuery: String): Boolean {
@@ -63,20 +77,8 @@ class BookRepository(private val service: BookService) {
         return success
     }
 
-    suspend fun loadBooksMore(searchQuery: String) {
-        if (isRequestInProgress) {
-            return
-        }
-
-        if (isEndPage) {
-            return
-        }
-
-        val success = requestSearchBooks(searchQuery)
-        if (success) {
-            lastPage++
-        }
-    }
+    private val _bookLikedPosition = MutableSharedFlow<Int>()
+    val bookLikedPosition = _bookLikedPosition.asSharedFlow()
 
     fun getBookDetail(isbn: String): ResultData<Book> {
         val book = inMemoryCache.find { it.isbn == isbn }
@@ -85,21 +87,16 @@ class BookRepository(private val service: BookService) {
         } ?: ResultData.Error("")
     }
 
-    fun updateBookLiked(bookId: String): Int {
-        return updateBookLikedInMemory(bookId)
+    suspend fun updateBookLiked(bookId: String) {
+        updateBookLikedInMemory(bookId)
     }
 
-    private fun updateBookLikedInMemory(isbn: String): Int {
+    private suspend fun updateBookLikedInMemory(isbn: String) {
         var updatedBookPosition = 0
         inMemoryCache.find { it.isbn == isbn }?.also { book ->
             book.liked = !book.liked
             updatedBookPosition = inMemoryCache.indexOf(book)
         }
-        return updatedBookPosition
+        _bookLikedPosition.emit(updatedBookPosition)
     }
-}
-
-sealed class ResultData<out T : Any> {
-    data class Success<T : Any>(val data: T) : ResultData<T>()
-    data class Error(val errorMessage: String) : ResultData<Nothing>()
 }

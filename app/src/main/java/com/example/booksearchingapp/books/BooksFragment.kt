@@ -12,11 +12,11 @@ import com.example.booksearchingapp.R
 import com.example.booksearchingapp.bookdetail.BookDetailFragment
 import com.example.booksearchingapp.databinding.FragmentBooksBinding
 import com.google.android.material.snackbar.Snackbar
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class BooksFragment : Fragment() {
 
-    private val viewModel: BooksViewModel by sharedViewModel()
+    private val viewModel: BooksViewModel by viewModel()
 
     private lateinit var binding: FragmentBooksBinding
 
@@ -93,9 +93,11 @@ class BooksFragment : Fragment() {
                 (adapter as? BooksAdapter)?.submitList(list)
             })
 
-            viewModel.updateLikedBook.observe(viewLifecycleOwner, EventObserver { updatedPosition ->
-                (adapter as? BooksAdapter)?.updateLiked(updatedPosition)
-            })
+            viewModel.updatedPositionOfBookLiked.observe(
+                viewLifecycleOwner,
+                Observer { updatedPosition ->
+                    (adapter as? BooksAdapter)?.updateLiked(updatedPosition)
+                })
         }
     }
 }
