@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.example.booksearchingapp.EventObserver
 import com.example.booksearchingapp.R
 import com.example.booksearchingapp.bookdetail.BookDetailFragment
@@ -61,9 +62,9 @@ class BooksFragment : Fragment() {
     }
 
     private fun setupSnackbar() {
-        viewModel.snackbarMessage.observe(viewLifecycleOwner) { message ->
+        viewModel.snackbarMessage.observe(viewLifecycleOwner, Observer { message ->
             message?.let { showSnackbar(it) }
-        }
+        })
     }
 
     private fun showSnackbar(message: String) {
@@ -88,9 +89,9 @@ class BooksFragment : Fragment() {
                 })
             }
 
-            viewModel.bookPreviewResults.observe(viewLifecycleOwner) { list ->
+            viewModel.bookPreviewResults.observe(viewLifecycleOwner, Observer { list ->
                 (adapter as? BooksAdapter)?.submitList(list)
-            }
+            })
 
             viewModel.updateLikedBook.observe(viewLifecycleOwner, EventObserver { updatedPosition ->
                 (adapter as? BooksAdapter)?.updateLiked(updatedPosition)

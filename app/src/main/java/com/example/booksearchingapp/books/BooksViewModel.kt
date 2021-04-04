@@ -1,6 +1,5 @@
 package com.example.booksearchingapp.books
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.example.booksearchingapp.Event
 import com.example.booksearchingapp.api.BaseResponse
@@ -27,22 +26,18 @@ class BooksViewModel(
     private val validateAndSearchQuery: LiveData<BaseResponse<List<Book>>> =
         searchingQueryEvent.switchMap { query ->
             liveData {
-                if (validateSearchingQuery(query).not()) {
-                    clearPreQuery()
-                    _emptySearchingQueryState.value = true
-                    return@liveData
-                } else {
-                    _emptySearchingQueryState.value = false
-                }
-                if (isNewQuery(query)) {
-                    val res =
-                        repository.getSearchedBookResultsLiveData(query)
+                _emptySearchingQueryState.value = validateSearchingQuery(query).not()
+
+                if (validateSearchingQuery(query)) {
+                    if (isNewQuery(query)) {
+                        val res = repository.getSearchedBookResultsLiveData(query)
                             .asLiveData(Dispatchers.Main)
-                    emitSource(res)
+                        emitSource(res)
+                    }
                 }
+                initPreQuery(query)
             }
         }
-
 
     val bookPreviewResults: LiveData<List<BookPreviewData>> =
         Transformations.map(validateAndSearchQuery) { result ->
@@ -65,9 +60,8 @@ class BooksViewModel(
     }
 
     private var preQuery = ""
-
-    private fun clearPreQuery() {
-        preQuery = ""
+    private fun initPreQuery(query: String?) {
+        preQuery = query ?: ""
     }
 
     private val loadBookDetailEvent = MutableLiveData<String>()
@@ -120,11 +114,7 @@ class BooksViewModel(
     }
 
     private fun isNewQuery(query: String): Boolean {
-        if (query != preQuery) {
-            preQuery = query
-            return true
-        }
-        return false
+        return query != preQuery
     }
 
     fun listScrolled() {

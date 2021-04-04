@@ -42,7 +42,7 @@ class BaseResponseAdapterFactory : CallAdapter.Factory() {
 
 
 class BaseResponseAdapter<R : Any>(
-    private val successType: Type,
+    private val successType: Type
 ) : CallAdapter<R, Call<BaseResponse<R>>> {
 
     override fun responseType(): Type = successType

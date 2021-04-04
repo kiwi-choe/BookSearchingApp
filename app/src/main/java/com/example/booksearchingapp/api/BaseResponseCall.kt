@@ -6,7 +6,7 @@ import retrofit2.*
 import java.io.IOException
 
 internal class BaseResponseCall<R : Any>(
-    private val delegate: Call<R>,
+    private val delegate: Call<R>
 ) : Call<BaseResponse<R>> {
 
     override fun enqueue(callback: Callback<BaseResponse<R>>) {
