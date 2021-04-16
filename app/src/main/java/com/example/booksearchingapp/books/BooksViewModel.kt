@@ -61,8 +61,8 @@ class BooksViewModel(
         preQuery = query ?: ""
     }
 
-    val updatedPositionOfBookLiked: LiveData<Int> =
-        repository.bookLikedPosition.asLiveData(Dispatchers.Main)
+    val updatedPositionOfBookLiked: LiveData<Event<Int>> =
+        repository.bookLikedPosition.map { Event(it) }.asLiveData(Dispatchers.Main)
 
     fun onTextChanged() {
         searchingQueryEvent.value = searchingQuery.value

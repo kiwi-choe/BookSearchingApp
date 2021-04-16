@@ -95,7 +95,7 @@ class BooksFragment : Fragment() {
 
             viewModel.updatedPositionOfBookLiked.observe(
                 viewLifecycleOwner,
-                Observer { updatedPosition ->
+                EventObserver { updatedPosition ->
                     (adapter as? BooksAdapter)?.updateLiked(updatedPosition)
                 })
         }
